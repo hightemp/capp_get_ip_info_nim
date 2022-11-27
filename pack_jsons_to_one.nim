@@ -85,4 +85,4 @@ for oFilePath in aFiles:
         else:
             echo ""
 
-writeFile("packed_data.json", $(%*(oDatabase)))
+writeFile("./bundle/packed_data.json", $(%*(oDatabase)))

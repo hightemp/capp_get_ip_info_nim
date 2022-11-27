@@ -1,8 +1,10 @@
+CFILE=capp_get_ip_info_nim
+
 nim c \
     --passL:-static \
     --spellSuggest \
     -d:release --opt:size \
-    capp_get_ip_info_nim.nim
+    $CFILE.nim
 
 if [ "$?" != "0" ]; then
     echo "====================================================="
@@ -11,7 +13,7 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-strip -s ./capp_get_ip_info_nim
+strip -s ./$CFILE
 
 if [ "$?" != "0" ]; then
     echo "====================================================="
@@ -20,7 +22,7 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-upx --best ./capp_get_ip_info_nim
+upx --best ./$CFILE
 
 if [ "$?" != "0" ]; then
     echo "====================================================="
@@ -43,4 +45,4 @@ fi
 timestamp=$(date +%s)
 VERSION=$(echo `cat VERSION`.$timestamp)
 
-gh release create $VERSION -t $VERSION -n "" capp_get_ip_info_nim
+gh release create $VERSION -t $VERSION -n "" $CFILE

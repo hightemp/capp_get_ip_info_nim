@@ -7,7 +7,7 @@ import lib
 
 proc writeHelp() = 
     echo ""
-    echo "capp_get_ip_info_nim 192.168.1.1"
+    echo "./capp_get_ip_info_nim 192.168.1.1"
     echo ""
     system.quit(1)
 
@@ -15,8 +15,7 @@ proc writeVersion() =
     echo "v0.1"
     system.quit(2)
 
-var filename: string
-let params: seq[string] = @[]
+var params: seq[string] = @[]
 
 var sIP = ""
 
@@ -32,10 +31,14 @@ for kind, key, val in getopt(params):
 if sIP == "":
     writeHelp()
 
-var sDataFile = "packed_data.json"
+import assetsfile
 
-let sData = readFile(sDataFile)
-let oJSONData = parseJson(sData)
+var sData = assetsfile.getAsset("bundle/packed_data.json")
+
+# var sDataFile = "packed_data.json"
+# var sData = readFile(sDataFile)
+
+var oJSONData = parseJson(sData)
 
 var iIP = fnIPToInt32(sIP)
 
