@@ -35,15 +35,17 @@ for oFilePath in aFiles:
                 if iK == oJSONData.len:
                     echo ""
                 if iK >= 6:
-                    var aRecord: seq[string] = @[]
-                    aRecord.add("P")
-                    aRecord.add(sName)
-                    aRecord = concat(aRecord, sRow.split("\t"))
-                    aRecord[2] = aRecord[2].replace("xxx", "0")
-                    aRecord[3] = aRecord[3].replace("xxx", "255")
-                    aRecord[2] = $(fnIPToInt32(aRecord[2]))
-                    aRecord[3] = $(fnIPToInt32(aRecord[3]))
-                    oDatabase.add(aRecord)
+                    var iPos = find(sRow, ":")
+                    if iPos == -1:
+                        var aRecord: seq[string] = @[]
+                        aRecord.add("P")
+                        aRecord.add(sName)
+                        aRecord = concat(aRecord, sRow.split("\t"))
+                        aRecord[2] = aRecord[2].replace("xxx", "0")
+                        aRecord[3] = aRecord[3].replace("xxx", "255")
+                        aRecord[2] = $(fnIPToInt(aRecord[2]))
+                        aRecord[3] = $(fnIPToInt(aRecord[3]))
+                        oDatabase.add(aRecord)
         of pcDir:
             echo "[!] Dir: ", oFilePath.path
         of pcLinkToFile:
@@ -79,8 +81,8 @@ for oFilePath in aFiles:
                 var aRecord: seq[string] = @[]
                 aRecord.add("C")
                 aRecord.add(sCountry)
-                aRecord.add($(fnIPToInt32(aRow[0].getStr())))
-                aRecord.add($(fnIPToInt32(aRow[1].getStr())))
+                aRecord.add($(fnIPToInt(aRow[0].getStr())))
+                aRecord.add($(fnIPToInt(aRow[1].getStr())))
                 oDatabase.add(aRecord)
         of pcDir:
             echo "[!] Dir: ", oFilePath.path
