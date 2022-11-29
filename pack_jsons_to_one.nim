@@ -2,14 +2,14 @@ import os
 import json
 import sequtils
 import strutils
-import sugar
-import posix
-import strformat
-import math
+import std/algorithm
 
 import lib
 
 # 89.107.0.0 - 1500184576
+
+proc fnSorting(a:seq[string], b:seq[string]):int = 
+    cmp(a[2].parseInt(), b[2].parseInt())
 
 var sBasePath = "./data/datacenter-list/"
 var aFiles = toSeq(walkDir(sBasePath, relative=true))
@@ -56,6 +56,12 @@ for oFilePath in aFiles:
 sBasePath = "./data/lite.ip2location.com/"
 aFiles = toSeq(walkDir(sBasePath, relative=true))
 
+oDatabase.sort(fnSorting)
+
+writeFile("./bundle/org_data.json", $(%*(oDatabase)))
+
+oDatabase = @[]
+
 for oFilePath in aFiles:
     case oFilePath.kind:
         of pcFile:
@@ -85,4 +91,6 @@ for oFilePath in aFiles:
         else:
             echo ""
 
-writeFile("./bundle/packed_data.json", $(%*(oDatabase)))
+oDatabase.sort(fnSorting)
+
+writeFile("./bundle/countries_data.json", $(%*(oDatabase)))

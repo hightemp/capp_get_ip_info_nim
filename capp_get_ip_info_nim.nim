@@ -2,7 +2,7 @@ import json
 import std/parseopt
 import sequtils
 import strutils
-
+import math
 import lib
 
 proc writeHelp() = 
@@ -33,24 +33,62 @@ if sIP == "":
 
 import assetsfile
 
-var sData = assetsfile.getAsset("bundle/packed_data.json")
+var sOrgData = assetsfile.getAsset("bundle/org_data.json")
+var sCountriesData = assetsfile.getAsset("bundle/countries_data.json")
 
 # var sDataFile = "packed_data.json"
 # var sData = readFile(sDataFile)
 
-var oJSONData = parseJson(sData)
+proc map(num: int, inMin: int, inMax: int, outMin: int, outMax: int): int =
+    return math.ceil((num - inMin) * (outMax - outMin) / (inMax - inMin)).toInt() + outMin;
 
-var iIP = fnIPToInt32(sIP)
+var oOrgJSONData = parseJson(sOrgData)
+var oCountriesJSONData = parseJson(sCountriesData)
 
-var aList = oJSONData.toSeq()
 var aResult: seq[seq[string]] = @[]
 
-for iK, oV in aList:
-    var aRow = oV.toSeq()
-    var iFrom = aRow[2].getStr().parseInt()
-    var iTo = aRow[3].getStr().parseInt()
+for oJSONData in @[oOrgJSONData, oCountriesJSONData]:
+    var iIP = fnIPToInt(sIP)
 
-    if iFrom<=iIP and iIP<=iTo:
-        aResult.add(@[aRow[0].getStr(), aRow[1].getStr()])
+    var aList = oJSONData.toSeq()
+    var iLen = aList.len()
 
+    var iPos = math.ceil(iLen/2).toInt()
+    var iDelta = math.ceil(iLen/2).toInt()
+    var oItem = aList[iPos].toSeq()[2]
+    var iPosIP = oItem.getStr().parseInt()
+
+    oItem = aList[0].toSeq()[2]
+    var iFirstIP = oItem.getStr().parseInt()
+    oItem = aList[iLen-1].toSeq()[2]
+    var iLastIP = oItem.getStr().parseInt()
+
+    var iCalcPos = map(iIP, iFirstIP, iLastIP, 0, iLen-1)
+    iPosIP = iIP
+
+    # echo iLen, " ", sIP, " ", iIP, " ", iCalcPos
+
+    while abs(iDelta)>1:
+        if iIP>iPosIP:
+            iDelta = math.ceil(iDelta/2).toInt()
+            iPos = iPos + iDelta
+        elif iIP<iPosIP:
+            iDelta = math.ceil(iDelta/2).toInt()
+            iPos = iPos - iDelta
+        oItem = aList[iPos].toSeq()[2]
+        iPosIP = oItem.getStr().parseInt()
+        # echo iDelta, " ", iPos, " ", iPosIP, " ", $(%*(aList[iPos].toSeq()))
+
+
+    # for iK, oV in aList:
+    #     var aRow = oV.toSeq()
+    #     var iFrom = aRow[2].getStr().parseInt()
+    #     var iTo = aRow[3].getStr().parseInt()
+
+    #     if iFrom<=iIP and iIP<=iTo:
+    #         aResult.add(@[aRow[0].getStr(), aRow[1].getStr()])
+
+    if (aList[iPos][2].getStr().parseInt()<=iIP and iIP<=aList[iPos][3].getStr().parseInt()):
+        aResult.add(@[aList[iPos][0].getStr(), aList[iPos][1].getStr()])
+        
 echo $(%*(aResult))
